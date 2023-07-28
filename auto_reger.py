@@ -16,7 +16,6 @@ from utils.cookies_manager import CookiesManager
 
 class AutoReger:
     def __init__(self):
-        self.emails_path: str = "data\\inputs\\emails.txt"
         self.proxies_path: str = "data\\inputs\\proxies.txt"
         self.wallets_path: str = "data\\inputs\\wallets.txt"
         self.twitter_cookies_path: str = "data\\inputs\\twitter_cookies.txt"
@@ -24,7 +23,6 @@ class AutoReger:
         self.success = 0
 
     def get_accounts(self):
-        emails = file_to_list(self.emails_path)
         wallets = file_to_list(self.wallets_path)
         proxies = file_to_list(self.proxies_path)
         twitter_cookies = CookiesManager(self.twitter_cookies_path).get_cookies()
@@ -32,16 +30,12 @@ class AutoReger:
         min_accounts_len = len(twitter_cookies)
 
         if not twitter_cookies:
-            logger.error("No twitter tweet_cookies in file!")
+            logger.error("Not found twitters in file!")
             return
 
         # if proxies or len(proxies) < min_accounts_len:
         #     logger.error("Not enough proxies!")
         #     return
-
-        if not emails:
-            logger.info(f"Generated random emails!")
-            emails = generate_random_emails(min_accounts_len)
 
         if not wallets:
             logger.info(f"Generated random wallets!")
@@ -49,17 +43,13 @@ class AutoReger:
 
         accounts = []
 
-        if len(emails) < len(wallets):
-            for i in range(len(emails)):
-                accounts.append((emails[i], wallets[i], proxies[i] if len(proxies) > i else None, twitter_cookies[i]))
-        else:
-            for i in range(len(wallets)):
-                accounts.append((emails[i], wallets[i], proxies[i] if len(proxies) > i else None, twitter_cookies[i]))
+        for i in range(len(twitter_cookies)):
+            accounts.append((wallets[i], proxies[i] if len(proxies) > i else None, twitter_cookies[i]))
 
         return accounts
 
     def remove_account(self):
-        return shift_file(self.emails_path), shift_file(self.wallets_path), \
+        return shift_file(self.wallets_path), \
             shift_file(self.proxies_path), shift_file(self.twitter_cookies_path)
 
     async def start(self):
@@ -93,7 +83,7 @@ class AutoReger:
             logger.warning(f"No accounts registered :(")
 
     async def register(self, account: tuple):
-        email, key, proxy, twitter_cookies = account
+        key, proxy, twitter_cookies = account
         trait_sniper = TraitSniper(twitter_cookies, key, proxy)
 
         is_ok = False
