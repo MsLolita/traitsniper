@@ -1,7 +1,7 @@
 import asyncio
 import traceback
 
-from exceptions import LoginError, CookiesParseError
+from exceptions import LoginError
 from utils import logger
 from utils.auto_generate.emails import generate_random_emails
 from utils.auto_generate.wallets import generate_random_wallets
